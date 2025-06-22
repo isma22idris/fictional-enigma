@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>viewHacking - Secure Your Digital Life</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7fa 0%, #f3e5f5 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Header styling */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #006064, #00838f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .about-switcher, .language-switcher {
+            position: relative;
+        }
+        
+        .about-btn, .language-btn {
+            background: #f5f5f5;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .about-btn:hover, .language-btn:hover {
+            background: #e0f7fa;
+            transform: translateY(-2px);
+        }
+        
+        .about-dropdown, .language-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            width: 180px;
+            margin-top: 10px;
+            display: none;
+            z-index: 10;
+        }
+        
+        .about-dropdown.show, .language-dropdown.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .about-option, .lang-option {
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        .about-option:hover, .lang-option:hover {
+            background: #f0f8ff;
+        }
+        
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            max-width: 900px;
+            margin: 40px auto;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .modal-header {
+            background: linear-gradient(45deg, #006064, #00838f);
+            color: white;
+            padding: 25px;
+            position: relative;
+        }
+        
+        .modal-title {
+            font-size: 2rem;
+            margin: 0;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .close-modal:hover {
+            transform: rotate(90deg);
+        }
+        
+        .modal-body {
+            padding: 30px;
+            max-height: 70vh;
+            overflow-y: auto;
+            line-height: 1.7;
+        }
+        
+        .modal-body h2 {
+            color: #006064;
+            margin: 25px 0 15px;
+            border-bottom: 2px solid #e0f7fa;
+            padding-bottom: 8px;
+        }
+        
+        .modal-body h3 {
+            color: #00838f;
+            margin: 20px 0 12px;
+        }
+        
+        .modal-body p {
+            margin-bottom: 15px;
+            color: #444;
+        }
+        
+        .modal-body ul {
+            padding-left: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .modal-body li {
+            margin-bottom: 8px;
+        }
+        
+        .founder-card {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            background: #f8fdff;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 20px;
+            border: 1px solid #e0f7fa;
+        }
+        
+        .founder-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #006064, #00838f);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+        }
+        
+        .founder-info {
+            flex: 1;
+        }
+        
+        .certifications {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .cert-badge {
+            background: #e0f7fa;
+            border-radius: 50px;
+            padding: 8px 20px;
+            font-weight: 600;
+            color: #006064;
+        }
+        
+        /* Navigation styling */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.7);
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 50px;
+            margin: 0 5px 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            min-width: 180px;
+            text-align: center;
+        }
+        
+        .tab-btn.active {
+            background: white;
+            color: #00838f;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 131, 143, 0.2);
+        }
+        
+        /* Main content styling */
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        /* Hero section styling */
+        .hero {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #006064, #00838f, #0097a7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.8rem;
+            color: #006064;
+            margin-bottom: 40px;
+            font-weight: 300;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.4;
+        }
+        
+        /* Checker section styling */
+        .checker {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .input-group {
+            display: flex;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            height: 60px;
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 150, 167, 0.2);
+        }
+        
+        .check-input {
+            flex-grow: 1;
+            border: none;
+            padding: 0 25px;
+            font-size: 1.1rem;
+            background: #f5f5f5;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .check-input:focus {
+            background: #fff;
+        }
+        
+        .check-btn {
+            background: linear-gradient(45deg, #006064, #00838f);
+            color: white;
+            border: none;
+            padding: 0 35px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .check-btn:hover {
+            background: linear-gradient(45deg, #00838f, #006064);
+            letter-spacing: 1px;
+        }
+        
+        /* Footer styling */
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px;
+            color: #00838f;
+            font-size: 1rem;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.3rem;
+            }
+            
+            .tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .tab-btn {
+                width: 100%;
+                max-width: 400px;
+                margin-bottom: 5px;
+                border-radius: 50px;
+            }
+            
+            .checker {
+                padding: 25px;
+            }
+            
+            .input-group {
+                height: 50px;
+            }
+            
+            .check-input {
+                padding: 0 15px;
+                font-size: 1rem;
+            }
+            
+            .check-btn {
+                padding: 0 25px;
+                font-size: 1rem;
+            }
+            
+            .founder-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .modal-content {
+                margin: 20px auto;
+            }
+            
+            .modal-body {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Privacy Policy Modal -->
+    <div class="modal" id="privacyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Privacy Policy</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>How we handle and protect your personal information (updated May 2025)</strong></p>
+                
+                <h2>About us and what we do</h2>
+                <p>viewHacking.com is owned and operated by Superlative Enterprises Pty Ltd ABN 62 085 442 020 ("Superlative", "we" or "us"). This policy explains what limited personal information we collect when you use the viewHacking website, the personal information we collect to provide our services and how we handle and protect your personal information.</p>
+                
+                <p>viewHacking's purpose is to help individuals and organisations combat data breaches which compromise personal information and privacy by enabling them to identify when information has been involved in any type of legitimate data breach (or leak). We help explain and make visible how personal information spreads online and support the use of strong passwords. Individuals and organisations may no longer be able to control information once it is breached, however, they can at least understand what has been leaked, where it has been leaked from and what precautionary measures should be taken as a result.</p>
+                
+                <p>viewHacking delivers a range of free and paid services to individuals and organisations anywhere in the world to help them determine if they have been impacted by a data breach so they can effectively respond and protect themselves and the information, including in relation to data breaches that have been verified and uploaded:</p>
+                
+                <ul>
+                    <li>a point-in-time search to check whether an email address entered by an individual into the viewHacking search engine has been involved in a data breach;</li>
+                    <li>a point-in-time search to find all breached email addresses on a domain verified as controlled by the enquirer;</li>
+                    <li>a point-in-time search for real world passwords previously exposed in data breaches;</li>
+                    <li>a subscriber service for verified individuals to be notified of data breaches connected to their email address; and</li>
+                    <li>a subscriber service for enterprises and individuals to assist in monitoring breaches.</li>
+                </ul>
+                
+                <h2>What kinds of personal information do we collect and hold and why?</h2>
+                <p>When we use the term personal information, we mean any information or an opinion about an individual who is identified or reasonably identifiable to us. Personal information is sometimes also referred to as personal data.</p>
+                
+                <p>To provide our services we receive and collect information sets online by various methods which may include personal information which has or may have been the subject of a current or historical data breach or leak or has otherwise been maliciously harvested by information stealer software. We process these data sets to verify the legitimacy of breach, the stealer logs, the unique email addresses in the data and to identify new breached passwords, and to prepare and upload impacted email addresses and passwords to the viewHacking database.</p>
+                
+                <p>We only collect the limited personal information we need from individuals who visit viewHacking or otherwise engage with us for the purposes of providing our services.</p>
+                
+                <p>We collect and hold email addresses for the purposes of providing our subscription services for verified email addresses.</p>
+                
+                <p>We do not collect or store your personal information when you conduct a search in the viewHacking database. Searching for an email address or phone number only ever retrieves the data from storage then returns it in the response. The data result the search is not explicitly stored anywhere.</p>
+                
+                <p>We also store some lists of data classes that were impacted in a particular data leak that is loaded into viewHacking. For example, we will state that email addresses and passwords appeared in a leak but will not provide any information about which email addresses had corresponding compromised passwords.</p>
+                
+                <p>The information we collect is not always personal information, as it may not relate to an identified individual or we otherwise may not be able to identify you from it.</p>
+                
+                <p>The information we provide is based on data leaks we have identified and collected. However, it does not represent all leaked information, and there may be breaches or exposures that we are unaware of or have not been made public. As a result, a User’s data could still be compromised even if it is not reflected on our Website</p>
+                
+                <h2>Other Information</h2>
+                <p>The Pwned Passwords feature searches compromised passwords from data leaks for the presence of a user-provided password. The password is hashed client-side with the SHA-1 algorithm then only the first 5 characters of the hash are sent to viewHacking following the Cloudflare k-anonymity implementation. viewHacking never receives the original password nor enough information to discover the original password. No identifying information about who the password belongs to is stored.</p>
+                
+                <p>Sensitive information is a subset of personal information that includes health information and other forms of sensitive personal information, and generally requires a higher level of privacy protection than other types of personal information. We do not aim to collect sensitive information.</p>
+                
+                <h2>Logging and Cookies</h2>
+                <p>We collect and hold only the bare minimum logging information required to keep the service operational and combat malicious activity. This includes transient web server logs to assess usage patterns and Application Insights for performance metrics. These logs may include information submitted in a form by the user, browser headers such as the user agent string and, in some cases, the user's IP address.</p>
+                
+                <p>We use cookies to support your use of our website and improve its functionality. When you visit our website, it will automatically send you a “cookie” over HTTPS. A cookie is a piece of text sent from a web server to your computer. This cookie stores information such as a session token or encrypted data on your device so that your session can persist across multiple requests. On its own it doesn’t disclose personal details, but once you sign in or provide identifying information (for example, by entering your email address), it lets us link that session back to you on subsequent visits. You can decline cookies any time by adjusting the cookies setting in your browser, but it can affect the functionality of the website for you.</p>
+                
+                <p>We do not use third party cookies or tracking pixels to collect or receive your information from our website and elsewhere on the internet and we don’t conduct targeted marketing or re-targeting, or serve you ads.</p>
+                
+                <h2>How do we collect, hold, use and disclose personal information?</h2>
+                <p><strong>Collection</strong><br>
+                We collect personal information:</p>
+                
+                <ul>
+                    <li>indirectly that may be in data sets received from a range of third party sources known and unknown and from contacts including enforcement bodies, shared directly or published in various forums or online – if your email is verified as being involved in a data breach then you can be notified of that by using our services.</li>
+                    <li>from individuals directly when they visit our website, use or subscribe to our services, submit a request through our support portal or contact us directly.</li>
+                    <li>from third parties, such as breached organisations, where Superlative can verify the legitimacy of a breach.</li>
+                    <li>from individuals we deal with directly, for example who represent our enterprise customers or partners.</li>
+                </ul>
+                
+                <p><strong>Storage</strong><br>
+                When a data breach is loaded into viewHacking by Superlative, the email addresses are stored in the online system. In limited cases, phone numbers are loaded in separately where they exist in an isolated data store not attached to any other personal information. Phone numbers are not linked to any corresponding email addresses. No other data of any kind (like names) is stored on data load.</p>
+                
+                <p>Superlative securely stores the personal information we hold in a Western United States of America Microsoft Azure data centre.</p>
+                
+                <p>The data sets from which emails (and passwords) are processed, verified and uploaded, are subsequently archived and separately and securely stored using a range of different measures, so they can be accessed on a restricted basis only, and used from time to time for breach verification or re-verification purposes in connection with our services and to respond to queries from legitimate third parties. We may delete breach data sets we have verified in certain circumstances.</p>
+                
+                <p><strong>Uses and disclosures</strong><br>
+                We use and disclose the personal information we hold for the purpose of providing our services.</p>
+                
+                <p>All payments are processed by an approved third party Stripe so we don’t collect and use individual payment details.</p>
+                
+                <p>Our subscriber database is checked when new breach data is loaded to establish if the subscriber appears in a new breach, and to send an email notification to the subscriber if required. These email notifications are only ever sent to subscribers who 'double' opt-in to receive notifications. This involves entering an email address on the notification page or domain search page, and then successfully proving control of the email address through email verification. The verification email contains a unique link which must be followed to confirm the subscriber opts-in. Anti-automation measures are in place to limit attempts to subscribe email addresses in bulk.</p>
+                
+                <p>We may also use and disclose personal information for purposes related to our services such as:</p>
+                
+                <ul>
+                    <li>to gain insights, to aggregate as statistics and to inform and educate the public. affected organisations and researchers about breaches, how personal information can be compromised and how to protect themselves.</li>
+                    <li>for a purpose you have consented to in the context of providing our services.</li>
+                    <li>to reach out to impacted organisations.</li>
+                    <li>if we are required or authorised by law to do so.</li>
+                </ul>
+                
+                <p><strong>Sensitive data breaches</strong><br>
+                Data breaches that we flag as sensitive are not returned in public searches on the website, they can only be viewed by using the subscription service and verifying ownership of the relevant email address first. Sensitive breaches are also searchable by domain owners who prove they control the domain using the domain search feature.</p>
+                
+                <p><strong>Domain searches</strong><br>
+                Domain searches allow the exposure of all email addresses on that domain to be returned in a single search. Only someone who controls the domain or the website it is bound to can perform a search via one of the verification processes:</p>
+                
+                <ul>
+                    <li>Via email address on the WHOIS record</li>
+                    <li>Via a common security or administrative email address (security@, hostmaster@, postmaster@, webmaster@)</li>
+                    <li>Via a meta tag with a unique code placed on the website</li>
+                    <li>Via a file with a unique code uploaded to the website</li>
+                    <li>Via a txt entry on the DNS record with a unique code</li>
+                </ul>
+                
+                <p>A domain search logs the domain name and requestor's IP address as part of anti-abuse measures. If you ask Superlative to notify you of future appearance of email addresses on that domain and you provide your email address so it can be notified, that email address is also stored. Anti-automation measures are in place to limit attempts to automate searches.</p>
+                
+                <p>When someone subscribes to notifications or searches a domain, that information is not passed to any third parties under any circumstances other than to send email using the SendGrid service.</p>
+                
+                <h2>Will we disclose your information overseas?</h2>
+                <p>We store all personal information securely in a Western United States of America Microsoft Azure data centre. This data is not shared or disclosed to any third parties overseas.</p>
+                
+                <h2>How do we protect your data?</h2>
+                <p>Security on viewHacking is handled by a "defence in depth" approach, that is the service employs many different layers of security including (but not limited to):</p>
+                
+                <ul>
+                    <li>all data transmitted over the internet is done over HTTPS;</li>
+                    <li>Cloudflare is used extensively to block potentially malicious requests;</li>
+                    <li>rate limits on APIs are implemented at both the code level and via Cloudflare;</li>
+                    <li>regular security scans are performed to identify code or configuration vulnerabilities;</li>
+                    <li>firewalls are employed to limit access to services running on Microsoft Azure; and</li>
+                    <li>disclosure of any security vulnerabilities are encouraged via the security.txt file.</li>
+                    <li>third party components are kept well-maintained (see OWASP's Using Components with Known Vulnerabilities).</li>
+                    <li>secure offline archival of data on encrypted storage devices</li>
+                </ul>
+                
+                <h2>Access to and correction of your personal information</h2>
+                <p><strong>Access</strong><br>
+                You may access the limited information we hold about you in the viewHacking platform in real time. Where there are sensitive breaches, we verify that the requester is the person to whom the information relates prior to allowing access.</p>
+                
+                <p>We don’t have any reasonable or practicable way to search for or retrieve and give access to any other personal information involved in a verified data breach and it is not part of our service or purpose. If you have confirmed your verified email address has been in a data breach you should reach out to the relevant impacted organisation if you want to know about any other personal information that was affected.</p>
+                
+                <p><strong>Correction</strong><br>
+                To ensure the quality and accuracy of the information we publish, we limit the information we collect that we upload to viewHacking after we take steps to verify identified and reported breaches and that we collect directly from you. Once we receive personal information known to be involved in a verified data breach, the information cannot be changed retroactively.</p>
+                
+                <p><strong>Sensitive data breaches</strong><br>
+                Data breaches flagged as sensitive are not returned in public searches. If you wish to prevent any other breached information from being publicly associated with your email address, please utilise our opt-out feature detailed below.</p>
+                
+                <p>In certain circumstances, subscribers may request correction to their personal information, such as their contact email address, by contacting us. Our contact details are set out below.</p>
+                
+                <h2>Unsubscribing and opt-out</h2>
+                <p><strong>By email</strong><br>
+                Every breach notification email that we send contains an unsubscribe link in the footer. If you would like to unsubscribe but cannot find a recent email from us, use the notification service to send another email to yourself and that will contain the unsubscribe link.</p>
+                
+                <p><strong>Using our opt-out feature</strong><br>
+                Superlative provides an opt-out feature for viewHacking that, if used, removes an email address from public visibility. The opt-out feature provides you with 3 different ways to control how your personal data is stored and accessed:</p>
+                
+                <ul>
+                    <li>Just removal from public searches: The public email address search no longer returns your address. Your address is still stored, you can still see breaches against it by verifying control with the notification service and anyone control the domain your address is on can continue to see breaches against it using the domain search feature.</li>
+                    <li>Remove all current and future breaches: No existing breaches impacting your address nor any occurring in the future will be stored against your address. No searches of any kind will return a breach associated with your address. Your address is retained alongside instructions to never load future breaches against it.</li>
+                    <li>Remove the email address entirely: The address and associated breaches are permanently removed. If a future breach is loaded that includes your address, it will become publicly searchable again.</li>
+                </ul>
+                
+                <h2>If you are based outside Australia</h2>
+                <p>The website and our services are public and available to everyone as long as they agree to our terms - that’s the point. We don’t actively target or monitor anyone and only process limited personal information of users of our website and services. Our Privacy Policy is intended to provide all relevant information about how we collect and process personal information and all the ways you can exercise your right over your personal information.</p>
+                
+                <h2>Questions, concerns or complaints</h2>
+                <p>If you have any questions, concerns or complaint about the way in which we have handled your personal information, you should contact us in the first instance. Our contact details are set out below.</p>
+                
+                <p>We will endeavour to reply to you within a reasonable time following receipt of the complaint and, where appropriate, will advise you of the general reasons for the outcome of the complaint.</p>
+                
+                <p>If you remain unsatisfied with the way in which we have handled a privacy issue, you may approach an independent advisor. There is more information and guidance on the website of the Office of the Australian Information Commissioner (www.oaic.gov.au) about protecting your privacy.</p>
+                
+                <h2>Our contact details</h2>
+                <p>If you have any questions, please contact us at:</p>
+                
+                <p>Superlative Enterprises<br>
+                Level 11<br>
+                2 Corporate Court<br>
+                Bundall 4217<br>
+                Queensland<br>
+                Australia<br>
+                support.viewhacking.com<br>
+                support@viewhacking.com</p>
+                
+                <h2>Changes to this policy</h2>
+                <p>From time to time, we may change our Privacy Policy to provide further information about how we handle personal information or the types of personal information which we hold. Any changes to our Privacy Policy will be published on our website.</p>
+                
+                <p>You may obtain a copy of our current Policy from our website or by contacting us at the contact details above.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Terms of Use Modal -->
+    <div class="modal" id="termsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Terms of Use</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3>Introduction</h3>
+                <p>Thanks for your interest in the viewHacking Services. Further down this page you'll find the terms of use, written up by Australian lawyers (viewHacking is owned and operated out of Australia).</p>
+                
+                <p>The intention of the terms of use is to ensure that viewHacking is used, as I've always said, "to do good things after bad things happen". Data breaches are an unfortunate reality of increasingly online lives, but post-breach we can use that data to help reduce the impact on breach victims. Using our Services to do that is awesome, whereas using our Services to disadvantage breach victims, is not (that includes using it to pitch them services or "ambulance chasing"). You're welcome to go and build amazing things that use our Services, my ask is that if you do that and display information from viewHacking, that you clearly indicate the source.</p>
+                
+                <p>Most of what you'll read in the terms is obvious and common sense: don't deliberately attempt to disrupt the Services, don't redistribute your API key to other parties (this is your secret), if you don't pay a recurring invoice for the Services, they'll be cancelled and so on and so forth. By necessity, some of it is a bit "legal speak" which is why I wanted to set the context for why upfront.</p>
+                
+                <p>I hope you use our Services to create something wonderful that helps breach victims, thank you for reading this and for your interest in viewHacking.</p>
+                
+                <p><strong>Ismail Idres<br>
+                Founder and CEO<br>
+                viewHacking</strong></p>
+                
+                <h2>PUBLIC GENERAL TERMS OF USE</h2>
+                <p>Welcome to viewHacking, operated by Superlative Enterprises Pty Ltd trading as "viewHacking" (we or us). We provide an online resource which facilitates the searching of email addresses, passwords and domains, allowing users to quickly assess if they, or people using their domain, may have been put at risk due to their online accounts having been compromised or "pwned" in a data breach or leak.</p>
+                
+                <p>These Terms of Use (Terms) (last updated in May 2025) set out the terms on which we offer our users and subscribers (referred to as you or your) access to our Services. These Terms set out your rights and responsibilities when using our Services, your Dashboard and our Website.</p>
+                
+                <p>You may access and purchase our Services through our website – viewhacking.com (Website). By accessing and/or purchasing any of our Services, you agree to be bound by these Terms. If you do not agree with these Terms, you are not entitled to receive or purchase our Services. If you have any questions, complaints, or comments about our Website, your Subscription or your Dashboard, please contact us on the information provided below. To find out more information about us please visit our FAQs page at support.viewhacking.com.</p>
+                
+                <h2>USE OF OUR SERVICES</h2>
+                <p><strong>Access to our Services</strong></p>
+                <p>Anyone can access our Website and use our Free Services. However, you will not be able to access and use our Paid Services unless you purchase a Subscription. The Services and bundles we offer are available for your review and selection on our Website. Terms related solely to your use of our Paid Services are dealt with further down in these Terms.</p>
+                
+                <p>In order to have an account with us, you must provide a valid email address and any other information required on our Website. We do not allow accounts to be established by automated means (i.e bots). If we reasonably believe that an account has been established by a bot or other automated means we may immediately cancel that account and terminate any associated Services.</p>
+                
+                <p><strong>Changes to our Services</strong></p>
+                <p>From time to time we may update, modify or remove features or functionality of our Services to reflect developments in technology. We will post any updates on our Website and amend our Documentation as required. If you have received Paid Services from us, and in the event of any Material Change, we will endeavour to provide you with written notice via your email address.</p>
+                
+                <p>If you do not agree with the changes we make to our Services you may discontinue your use of our Free Services at any time or cancel your Subscription via your Dashboard at any time. If you receive Paid Services from us, and in the event of a Material Change, you are entitled to contact us within 30 days of receiving notice of the Material Change to arrange for a refund for any unused pre-paid portion of the Subscription Fee. Our contact details are outlined in clause 16.</p>
+                
+                <h2>YOUR GENERAL OBLIGATIONS</h2>
+                <p>You are not permitted to:</p>
+                <ul>
+                    <li>access or use our Services:
+                        <ul>
+                            <li>for any purpose other than the Permitted Purpose;</li>
+                            <li>unless otherwise agreed in writing with us, for the benefit of a third party (including for use by a related entity or for the purpose of reselling or otherwise making the Services available to any third party for commercial benefit) other than as expressly permitted by the Terms;</li>
+                            <li>to provide an outsourced or white label service without identifying us as the source of the data and following our brand usage guidelines available on our Website from time to time;</li>
+                            <li>use our Services to query email addresses or domains belonging to individuals or organisations in a way that would disadvantage them or be construed as solicitation;</li>
+                        </ul>
+                    </li>
+                    <li>use our Services in a way that has the potential to, or will, damage our goodwill or reputation or endanger, jeopardise or prejudicially affect our business in any manner;</li>
+                    <li>interfere with or disrupt the integrity of the performance of our Services in any way, including:
+                        <ul>
+                            <li>attempting to gain unauthorised access to our Services or its related systems and networks;</li>
+                            <li>accessing or using our Services in a manner that introduces malicious programs into our Services including viruses, worms, trojan horses and e-mail bombs;</li>
+                            <li>modifying, reproducing, revising, transmitting, distributing, reverse engineering or altering our Services or viewHacking Data, including redistributing your API Key or other login details, or its configuration, to any other party; or</li>
+                            <li>using our Services in a manner that could harm or impair anyone else's use of our Services.</li>
+                        </ul>
+                    </li>
+                </ul>
+                
+                <p>Unless otherwise agreed in writing by us, you must not give a third-party access to your account or Services. You are responsible for:</p>
+                <ul>
+                    <li>maintaining the confidentiality and security of your account; and</li>
+                    <li>for all activities which occur using your account.</li>
+                </ul>
+                
+                <p>You are responsible for obtaining all computer hardware, software, network, internet, mobile telecommunications and any other necessary equipment required to access and use our Services.</p>
+                
+                <p>You must ensure that your access to and use of our Services does not contravene any applicable laws and that you have all relevant approvals, licences and permissions relevant to the activities you are undertaking using our Services.</p>
+                
+                <!-- Remaining content truncated for brevity -->
+                <p style="text-align: center; margin: 20px 0; font-weight: bold; color: #006064;">
+                    [Remaining content of Terms of Use is available in the actual implementation]
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Meet the Founder Modal -->
+    <div class="modal" id="founderModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Meet the Founder</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="founder-card">
+                    <div class="founder-image">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="founder-info">
+                        <h2>Ismail Idres</h2>
+                        <p>My name is Ismail Idres, the founder of this website. At just 17 years old, I have earned three certifications: Cisco CCNA, Security+, and CompTIA CySA+ (Cybersecurity Analyst). I am committed to delivering the best in the near future, and you will see many exciting projects from me soon.</p>
+                        
+                        <h3>Certifications</h3>
+                        <div class="certifications">
+                            <div class="cert-badge">Cisco CCNA</div>
+                            <div class="cert-badge">Security+</div>
+                            <div class="cert-badge">CompTIA CySA+</div>
+                        </div>
+                        
+                        <h3>Vision</h3>
+                        <p>I created viewHacking to empower individuals and organizations to protect themselves in an increasingly digital world. My goal is to make cybersecurity accessible to everyone, regardless of their technical background.</p>
+                        
+                        <h3>Future Projects</h3>
+                        <p>Stay tuned for upcoming projects that will revolutionize how we think about digital security and privacy. I'm working on innovative solutions to combat emerging cyber threats and make the internet safer for all users.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <header>
+        <div class="logo-section">
+            <h1 class="logo">viewHacking</h1>
+        </div>
+        <div class="header-right">
+            <div class="about-switcher">
+                <button class="about-btn">
+                    <i class="fas fa-info-circle"></i> About
+                </button>
+                <div class="about-dropdown" id="aboutDropdown">
+                    <div class="about-option" data-option="privacy">
+                        <i class="fas fa-shield-alt"></i> Privacy Policy
+                    </div>
+                    <div class="about-option" data-option="terms">
+                        <i class="fas fa-file-contract"></i> Terms of Use
+                    </div>
+                    <div class="about-option" data-option="founder">
+                        <i class="fas fa-user-tie"></i> Meet the Founder
+                    </div>
+                </div>
+            </div>
+            
+            <div class="language-switcher">
+                <button class="language-btn">
+                    <i class="fas fa-globe"></i> English
+                </button>
+                <div class="language-dropdown" id="languageDropdown">
+                    <div class="lang-option" data-lang="en">
+                        <i class="fas fa-language"></i> English
+                    </div>
+                    <div class="lang-option" data-lang="ar">
+                        <i class="fas fa-language"></i> العربية (Arabic)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="email-checker">Email Checker</button>
+        <button class="tab-btn" data-tab="link-checker">Link Checker</button>
+        <button class="tab-btn" data-tab="password-checker">Password Checker</button>
+    </div>
+    
+    <div class="container">
+        <!-- Email Checker Page -->
+        <div class="page active" id="email-checker">
+            <section class="hero">
+                <h1 class="hero-title">viewHacking</h1>
+                <p class="hero-subtitle">Check if your email address is in a data breach</p>
+            </section>
+            
+            <section class="checker">
+                <div class="input-group">
+                    <input type="email" class="check-input" id="emailInput" placeholder="Enter your email address">
+                    <button class="check-btn" id="emailCheckBtn">
+                        <i class="fas fa-shield-alt"></i> Check Email
+                    </button>
+                </div>
+                
+                <div class="result" id="emailResult">
+                    <!-- Email check result will appear here -->
+                </div>
+            </section>
+            
+            <section class="damage-section">
+                <h2 class="section-title">Damages of Email Breach</h2>
+                <div class="damage-grid">
+                    <div class="damage-card">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Security Vulnerabilities</h3>
+                        <p>Exposed emails make accounts vulnerable to brute-force attacks and password cracking. Hackers can gain unauthorized access to personal and financial accounts.</p>
+                    </div>
+                    
+                    <div class="damage-card">
+                        <i class="fas fa-fish"></i>
+                        <h3>Phishing Attacks</h3>
+                        <p>Cybercriminals use breached emails to send convincing phishing messages, tricking users into revealing sensitive information or installing malware.</p>
+                    </div>
+                    
+                    <div class="damage-card">
+                        <i class="fas fa-id-card"></i>
+                        <h3>Identity Theft</h3>
+                        <p>With enough personal information from breaches, criminals can impersonate victims to open new accounts, obtain loans, or commit fraud.</p>
+                    </div>
+                    
+                    <div class="damage-card">
+                        <i class="fas fa-spam"></i>
+                        <h3>Spam & Malware</h3>
+                        <p>Breached email addresses often end up on spam lists, leading to an overwhelming volume of unwanted emails, many containing malicious links or attachments.</p>
+                    </div>
+                    
+                    <div class="damage-card">
+                        <i class="fas fa-lock"></i>
+                        <h3>Account Takeover</h3>
+                        <p>Hackers use leaked credentials to access other accounts where victims reused the same password, leading to complete account compromise.</p>
+                    </div>
+                    
+                    <div class="damage-card">
+                        <i class="fas fa-user-secret"></i>
+                        <h3>Reputation Damage</h3>
+                        <p>Compromised accounts can be used to send malicious emails to contacts, damaging personal and professional relationships and reputation.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Link Checker Page -->
+        <div class="page" id="link-checker">
+            <section class="hero">
+                <h1 class="hero-title">viewHacking</h1>
+                <p class="hero-subtitle">Check if a link is safe before you click it</p>
+            </section>
+            
+            <section class="checker">
+                <div class="input-group">
+                    <input type="url" class="check-input" id="linkInput" placeholder="Enter the link to check">
+                    <button class="check-btn" id="linkCheckBtn">
+                        <i class="fas fa-link"></i> Check Link
+                    </button>
+                </div>
+                
+                <div class="result" id="linkResult">
+                    <!-- Link check result will appear here -->
+                </div>
+            </section>
+            
+            <section class="damage-section">
+                <h2 class="section-title">Dangers of Unsafe Links</h2>
+                <div class="damage-grid">
+                    <div class="damage-card">
+                        <i class="fas fa-virus"></i>
+                        <h3>Malware Infections</h3>
+                        <p>Malicious links can install viruses, ransomware, or spyware on your device, compromising your data and system security.</p>
+                    </div>
+                    
+                    <div class="damage-card">
+                        <i class="fas fa-user-lock"></i>
+                        <h3>Credential Theft</h3>
+                        <p>Phishing sites often mimic legitimate login pages to steal usernames, passwords, and financial information.</p>
+                    </div>
+                    
+                    <div class="damage-card">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <h3>Financial Fraud</h3>
+                        <p>Scam links can lead to fake shopping sites or payment portals designed to steal credit card information and money.</p>
+                    </div>
+                    
+                    <div class="damage-card">
+                        <i class="fas fa-database"></i>
+                        <h3>Data Breaches</h3>
+                        <p>Compromised links can expose sensitive personal and business data to hackers, leading to identity theft and corporate espionage.</p>
+                    </div>
+                    
+                    <div class="damage-card">
+                        <i class="fas fa-cogs"></i>
+                        <h3>System Hijacking</h3>
+                        <p>Some malicious links can take control of your device, turning it into part of a botnet for illegal activities.</p>
+                    </div>
+                    
+                    <div class="damage-card">
+                        <i class="fas fa-ban"></i>
+                        <h3>Ransomware Attacks</h3>
+                        <p>Clicking infected links can result in ransomware that encrypts your files and demands payment for their release.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Password Checker Page -->
+        <div class="page" id="password-checker">
+            <section class="hero">
+                <h1 class="hero-title">viewHacking</h1>
+                <p class="hero-subtitle">Check the strength of your password</p>
+            </section>
+            
+            <section class="checker">
+                <div class="input-group">
+                    <input type="password" class="check-input" id="passwordInput" placeholder="Enter your password">
+                    <button class="check-btn" id="passwordCheckBtn">
+                        <i class="fas fa-key"></i> Check Password
+                    </button>
+                </div>
+                
+                <div class="strength-meter">
+                    <div class="strength-level" id="strengthLevel"></div>
+                </div>
+                
+                <div class="strength-text" id="strengthText">Password not checked yet</div>
+                
+                <div class="password-criteria">
+                    <div class="criterion" id="lengthCriterion">
+                        <i class="fas fa-times-circle"></i>
+                        <span>At least 8 characters</span>
+                    </div>
+                    <div class="criterion" id="uppercaseCriterion">
+                        <i class="fas fa-times-circle"></i>
+                        <span>Contains uppercase letters</span>
+                    </div>
+                    <div class="criterion" id="lowercaseCriterion">
+                        <i class="fas fa-times-circle"></i>
+                        <span>Contains lowercase letters</span>
+                    </div>
+                    <div class="criterion" id="numberCriterion">
+                        <i class="fas fa-times-circle"></i>
+                        <span>Contains numbers</span>
+                    </div>
+                    <div class="criterion" id="symbolCriterion">
+                        <i class="fas fa-times-circle"></i>
+                        <span>Contains symbols</span>
+                    </div>
+                    <div class="criterion" id="commonCriterion">
+                        <i class="fas fa-times-circle"></i>
+                        <span>Not a common password</span>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="damage-section">
+                <h2 class="section-title">Risks of Weak Passwords</h2>
+                <div class="damage-grid">
+                    <div class="damage-card">
+                        <i class="fas fa-unlock-alt"></i>
+                        <h3>Easy to Guess</h3>
+                        <p>Weak passwords can be easily guessed by attackers using common password lists or personal information.</p>
+                    </div>
+                    
+                    <div class="damage-card">
+                        <i class="fas fa-bolt"></i>
+                        <h3>Brute Force Vulnerable</h3>
+                        <p>Simple passwords can be cracked in seconds using automated brute-force attacks.</p>
+                    </div>
+                    
+                    <div class="damage-card">
+                        <i class="fas fa-users"></i>
+                        <h3>Account Takeover</h3>
+                        <p>Compromised passwords can lead to complete account takeover and identity theft.</p>
+                    </div>
+                    
+                    <div class="damage-card">
+                        <i class="fas fa-sync-alt"></i>
+                        <h3>Password Reuse</h3>
+                        <p>Many users reuse passwords, so one breach can compromise multiple accounts.</p>
+                    </div>
+                    
+                    <div class="damage-card">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <h3>Financial Loss</h3>
+                        <p>Weak passwords can lead to unauthorized access to financial accounts and theft.</p>
+                    </div>
+                    
+                    <div class="damage-card">
+                        <i class="fas fa-cloud-download-alt"></i>
+                        <h3>Data Breaches</h3>
+                        <p>Weak passwords are a primary cause of data breaches in organizations.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2023 viewHacking - Protecting your digital identity</p>
+        <p>Note: This is a demonstration tool. For real security checks, use professional services.</p>
+    </footer>
+    
+    <script>
+        // Tab switching functionality
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const pages = document.querySelectorAll('.page');
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all tabs and pages
+                tabBtns.forEach(b => b.classList.remove('active'));
+                pages.forEach(page => page.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding page
+                btn.classList.add('active');
+                const tabId = btn.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+                
+                // Clear previous results when switching tabs
+                if (tabId === 'email-checker') {
+                    document.getElementById('emailResult').style.display = 'none';
+                } else if (tabId === 'link-checker') {
+                    document.getElementById('linkResult').style.display = 'none';
+                } else if (tabId === 'password-checker') {
+                    document.getElementById('passwordInput').value = '';
+                    resetPasswordCriteria();
+                    document.getElementById('strengthText').textContent = 'Password not checked yet';
+                    document.getElementById('strengthLevel').className = 'strength-level';
+                    document.getElementById('strengthLevel').style.width = '0';
+                }
+            });
+        });
+        
+        // Language switcher functionality
+        const langBtn = document.querySelector('.language-btn');
+        const langDropdown = document.getElementById('languageDropdown');
+        const langOptions = document.querySelectorAll('.lang-option');
+        
+        langBtn.addEventListener('click', () => {
+            langDropdown.classList.toggle('show');
+        });
+        
+        langOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const lang = option.getAttribute('data-lang');
+                const langText = option.textContent.trim();
+                
+                // Update button text
+                langBtn.innerHTML = `<i class="fas fa-globe"></i> ${langText}`;
+                langDropdown.classList.remove('show');
+                
+                // Toggle body direction for Arabic
+                if (lang === 'ar') {
+                    document.body.dir = 'rtl';
+                    document.body.lang = 'ar';
+                    document.querySelector('html').lang = 'ar';
+                    translateToArabic();
+                } else {
+                    document.body.dir = 'ltr';
+                    document.body.lang = 'en';
+                    document.querySelector('html').lang = 'en';
+                    translateToEnglish();
+                }
+            });
+        });
+        
+        // About switcher functionality
+        const aboutBtn = document.querySelector('.about-btn');
+        const aboutDropdown = document.getElementById('aboutDropdown');
+        const aboutOptions = document.querySelectorAll('.about-option');
+        
+        aboutBtn.addEventListener('click', () => {
+            aboutDropdown.classList.toggle('show');
+        });
+        
+        aboutOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const optionType = option.getAttribute('data-option');
+                aboutDropdown.classList.remove('show');
+                
+                // Show the appropriate modal
+                if (optionType === 'privacy') {
+                    document.getElementById('privacyModal').style.display = 'block';
+                } else if (optionType === 'terms') {
+                    document.getElementById('termsModal').style.display = 'block';
+                } else if (optionType === 'founder') {
+                    document.getElementById('founderModal').style.display = 'block';
+                }
+            });
+        });
+        
+        // Close modals
+        const closeButtons = document.querySelectorAll('.close-modal');
+        closeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+            });
+        });
+        
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+            }
+        });
+        
+        // Email check functionality
+        document.getElementById('emailCheckBtn').addEventListener('click', () => {
+            const emailInput = document.getElementById('emailInput').value.trim();
+            const resultDiv = document.getElementById('emailResult');
+            
+            // Validate email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(emailInput)) {
+                alert('Please enter a valid email address');
+                return;
+            }
+            
+            // Show loading
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: #00838f;"></i>
+                    <p style="margin-top: 15px; font-size: 1.2rem;">Checking email security...</p>
+                </div>
+            `;
+            
+            // Simulate API call
+            setTimeout(() => {
+                const isBreached = Math.random() > 0.5;
+                
+                if (!isBreached) {
+                    // Safe email
+                    resultDiv.className = 'result safe';
+                    resultDiv.innerHTML = `
+                        <i class="fas fa-check-circle result-icon"></i>
+                        <h2 class="result-title">Your email is secure</h2>
+                        <p>The email address <strong>${emailInput}</strong> has not been found in any known data breaches.</p>
+                    `;
+                } else {
+                    // Breached email
+                    const breaches = [
+                        { name: 'Adobe', year: 2013 },
+                        { name: 'LinkedIn', year: 2016 },
+                        { name: 'MyFitnessPal', year: 2018 },
+                        { name: 'Canva', year: 2019 },
+                        { name: 'Facebook', year: 2021 }
+                    ];
+                    
+                    const count = Math.floor(Math.random() * 3) + 1;
+                    const randomBreaches = [];
+                    for (let i = 0; i < count; i++) {
+                        const randomIndex = Math.floor(Math.random() * breaches.length);
+                        randomBreaches.push(breaches[randomIndex]);
+                    }
+                    
+                    resultDiv.className = 'result danger';
+                    resultDiv.innerHTML = `
+                        <i class="fas fa-exclamation-triangle result-icon"></i>
+                        <h2 class="result-title">Your email appeared in ${count} breaches</h2>
+                        <p>The email address <strong>${emailInput}</strong> was found in the following data breaches:</p>
+                        <ul class="breach-list">
+                            ${randomBreaches.map(breach => 
+                                `<li class="breach-item">${breach.name} ${breach.year}</li>`
+                            ).join('')}
+                        </ul>
+                        <p style="margin-top: 15px; font-weight: 500;">We recommend changing passwords associated with this email immediately.</p>
+                    `;
+                }
+            }, 2000);
+        });
+        
+        // Link check functionality
+        document.getElementById('linkCheckBtn').addEventListener('click', () => {
+            const linkInput = document.getElementById('linkInput').value.trim();
+            const resultDiv = document.getElementById('linkResult');
+            
+            // Validate URL
+            if (!linkInput || !linkInput.startsWith('http')) {
+                alert('Please enter a valid URL starting with http:// or https://');
+                return;
+            }
+            
+            // Show loading
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: #00838f;"></i>
+                    <p style="margin-top: 15px; font-size: 1.2rem;">Analyzing link safety...</p>
+                </div>
+            `;
+            
+            // Simulate API call
+            setTimeout(() => {
+                const isSafe = Math.random() > 0.5;
+                
+                if (isSafe) {
+                    // Safe link
+                    resultDiv.className = 'result safe';
+                    resultDiv.innerHTML = `
+                        <i class="fas fa-check-circle result-icon"></i>
+                        <h2 class="result-title">This link is safe</h2>
+                        <p>The URL <strong>${truncateText(linkInput, 40)}</strong> appears to be safe to visit.</p>
+                        <p style="margin-top: 15px; font-weight: 500;">No known security threats were detected.</p>
+                    `;
+                } else {
+                    // Dangerous link
+                    const threats = [
+                        "Phishing attempt detected",
+                        "Malware distribution identified",
+                        "Suspicious redirects found",
+                        "Known scam website",
+                        "Fake login page detected"
+                    ];
+                    
+                    const count = Math.floor(Math.random() * 3) + 1;
+                    const randomThreats = [];
+                    for (let i = 0; i < count; i++) {
+                        const randomIndex = Math.floor(Math.random() * threats.length);
+                        randomThreats.push(threats[randomIndex]);
+                    }
+                    
+                    resultDiv.className = 'result danger';
+                    resultDiv.innerHTML = `
+                        <i class="fas fa-exclamation-triangle result-icon"></i>
+                        <h2 class="result-title">Dangerous link detected!</h2>
+                        <p>The URL <strong>${truncateText(linkInput, 40)}</strong> has been flagged for the following security issues:</p>
+                        <ul class="threat-list">
+                            ${randomThreats.map(threat => 
+                                `<li class="threat-item">${threat}</li>`
+                            ).join('')}
+                        </ul>
+                        <p style="margin-top: 15px; font-weight: 500; color: #c62828;">
+                            <i class="fas fa-skull-crossbones"></i> Do not visit this website!
+                        </p>
+                    `;
+                }
+            }, 2000);
+        });
+        
+        // Helper functions
+        function truncateText(text, maxLength) {
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        }
+        
+        function resetPasswordCriteria() {
+            const criteria = document.querySelectorAll('.criterion');
+            criteria.forEach(criterion => {
+                criterion.className = 'criterion';
+                criterion.innerHTML = `<i class="fas fa-times-circle"></i> <span>${criterion.textContent}</span>`;
+            });
+        }
+        
+        // Translation functions
+        function translateToArabic() {
+            // Update UI text to Arabic
+            document.querySelector('[data-tab="email-checker"]').textContent = 'فحص البريد';
+            document.querySelector('[data-tab="link-checker"]').textContent = 'فحص الروابط';
+            document.querySelector('[data-tab="password-checker"]').textContent = 'فحص كلمة المرور';
+            
+            document.querySelector('#email-checker .hero-subtitle').textContent = 'تحقق مما إذا كان بريدك الإلكتروني موجودًا في تسريب للبيانات';
+            document.querySelector('#emailInput').placeholder = 'أدخل عنوان بريدك الإلكتروني';
+            document.querySelector('#emailCheckBtn').innerHTML = '<i class="fas fa-shield-alt"></i> فحص البريد';
+            
+            document.querySelector('#link-checker .hero-subtitle').textContent = 'تحقق مما إذا كان الرابط آمنًا قبل النقر عليه';
+            document.querySelector('#linkInput').placeholder = 'أدخل الرابط للتحقق';
+            document.querySelector('#linkCheckBtn').innerHTML = '<i class="fas fa-link"></i> فحص الرابط';
+            
+            document.querySelector('#password-checker .hero-subtitle').textContent = 'تحقق من قوة كلمة المرور الخاصة بك';
+            document.querySelector('#passwordInput').placeholder = 'أدخل كلمة المرور الخاصة بك';
+            document.querySelector('#passwordCheckBtn').innerHTML = '<i class="fas fa-key"></i> فحص كلمة المرور';
+            
+            document.querySelector('#lengthCriterion span').textContent = '8 أحرف على الأقل';
+            document.querySelector('#uppercaseCriterion span').textContent = 'تحتوي على أحرف كبيرة';
+            document.querySelector('#lowercaseCriterion span').textContent = 'تحتوي على أحرف صغيرة';
+            document.querySelector('#numberCriterion span').textContent = 'تحتوي على أرقام';
+            document.querySelector('#symbolCriterion span').textContent = 'تحتوي على رموز';
+            document.querySelector('#commonCriterion span').textContent = 'ليست كلمة مرور شائعة';
+            
+            document.querySelector('footer p:first-child').textContent = '© 2023 viewHacking - حماية هويتك الرقمية';
+            document.querySelector('footer p:last-child').textContent = 'ملاحظة: هذه أداة توضيحية. للفحوصات الأمنية الحقيقية، استخدم خدمات احترافية.';
+        }
+        
+        function translateToEnglish() {
+            // Update UI text to English
+            document.querySelector('[data-tab="email-checker"]').textContent = 'Email Checker';
+            document.querySelector('[data-tab="link-checker"]').textContent = 'Link Checker';
+            document.querySelector('[data-tab="password-checker"]').textContent = 'Password Checker';
+            
+            document.querySelector('#email-checker .hero-subtitle').textContent = 'Check if your email address is in a data breach';
+            document.querySelector('#emailInput').placeholder = 'Enter your email address';
+            document.querySelector('#emailCheckBtn').innerHTML = '<i class="fas fa-shield-alt"></i> Check Email';
+            
+            document.querySelector('#link-checker .hero-subtitle').textContent = 'Check if a link is safe before you click it';
+            document.querySelector('#linkInput').placeholder = 'Enter the link to check';
+            document.querySelector('#linkCheckBtn').innerHTML = '<i class="fas fa-link"></i> Check Link';
+            
+            document.querySelector('#password-checker .hero-subtitle').textContent = 'Check the strength of your password';
+            document.querySelector('#passwordInput').placeholder = 'Enter your password';
+            document.querySelector('#passwordCheckBtn').innerHTML = '<i class="fas fa-key"></i> Check Password';
+            
+            document.querySelector('#lengthCriterion span').textContent = 'At least 8 characters';
+            document.querySelector('#uppercaseCriterion span').textContent = 'Contains uppercase letters';
+            document.querySelector('#lowercaseCriterion span').textContent = 'Contains lowercase letters';
+            document.querySelector('#numberCriterion span').textContent = 'Contains numbers';
+            document.querySelector('#symbolCriterion span').textContent = 'Contains symbols';
+            document.querySelector('#commonCriterion span').textContent = 'Not a common password';
+            
+            document.querySelector('footer p:first-child').textContent = '© 2023 viewHacking - Protecting your digital identity';
+            document.querySelector('footer p:last-child').textContent = 'Note: This is a demonstration tool. For real security checks, use professional services.';
+        }
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!langBtn.contains(e.target) && !langDropdown.contains(e.target)) {
+                langDropdown.classList.remove('show');
+            }
+            
+            if (!aboutBtn.contains(e.target) && !aboutDropdown.contains(e.target)) {
+                aboutDropdown.classList.remove('show');
+            }
+        });
+        
+        // Allow Enter key to trigger checks
+        document.getElementById('emailInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('emailCheckBtn').click();
+            }
+        });
+        
+        document.getElementById('linkInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('linkCheckBtn').click();
+            }
+        });
+        
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('passwordCheckBtn').click();
+            }
+        });
+    </script>
+</body>
+</html>
